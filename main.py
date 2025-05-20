@@ -1,9 +1,11 @@
+import os
+
 import psycopg2
 from dotenv import load_dotenv
-import os
+
 from src.api import HeadHunterAPI
-from src.saver import create_database, create_tables, save_employer_to_db, save_vacancies_to_db
 from src.db_manager import DBManager
+from src.saver import create_database, create_tables, save_employer_to_db, save_vacancies_to_db
 
 
 def main() -> None:
@@ -14,7 +16,7 @@ def main() -> None:
         "host": os.getenv("DB_HOST"),
         "database": "postgres",
         "user": os.getenv("DB_USER"),
-        "password": os.getenv("DB_PASSWORD")
+        "password": os.getenv("DB_PASSWORD"),
     }
     db_name = os.getenv("DB_NAME")
 
@@ -49,23 +51,25 @@ def user_interaction() -> None:
         "host": os.getenv("DB_HOST"),
         "database": os.getenv("DB_NAME"),
         "user": os.getenv("DB_USER"),
-        "password": os.getenv("DB_PASSWORD")
+        "password": os.getenv("DB_PASSWORD"),
     }
     db_manager = DBManager(db_params)
 
     while True:
-        print("""
+        print(
+            """
     ══════════════════════════════════
-             Меню действий          
+             Меню действий
     ══════════════════════════════════
-    1. Список компаний и вакансий  
-    2. Список всех вакансий  
-    3. Средняя зарплата  
-    4. Вакансии с зарплатой выше средней  
-    5. Поиск по ключевому слову  
-    0. Выход  
+    1. Список компаний и вакансий
+    2. Список всех вакансий
+    3. Средняя зарплата
+    4. Вакансии с зарплатой выше средней
+    5. Поиск по ключевому слову
+    0. Выход
     ══════════════════════════════════
-        """)
+        """
+        )
 
         value = input("> ").strip()
 

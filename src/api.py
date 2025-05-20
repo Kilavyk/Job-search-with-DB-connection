@@ -1,5 +1,6 @@
-import requests
 from typing import Dict, List, Optional
+
+import requests
 
 
 class HeadHunterAPI:
@@ -24,17 +25,14 @@ class HeadHunterAPI:
         pages = 1  # Конечная страница
 
         while page < pages:
-            params = {
-                "employer_id": employer_id,
-                "page": page,
-                "per_page": 100
-            }
+            params = {"employer_id": employer_id, "page": page, "per_page": 100}
 
-            response = requests.get(f"{self.base_url}vacancies", headers=self.headers, params=params)
+            response = requests.get(
+                f"{self.base_url}vacancies", headers=self.headers, params=params
+            )
             response.raise_for_status()
             data = response.json()
             vacancies.extend(data["items"])
             pages = data["pages"]
             page += 1
         return vacancies
-

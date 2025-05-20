@@ -1,5 +1,6 @@
-import psycopg2
 from typing import Dict, List
+
+import psycopg2
 
 
 def create_database(params: dict, db_name: str) -> None:
@@ -29,15 +30,18 @@ def create_tables(conn) -> None:
     """Создание таблиц employers и vacancies в базе данных."""
     try:
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE employers (
                     employer_id VARCHAR(20) PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     industry TEXT,
                     url VARCHAR(255)
                 )
-            """)
-            cur.execute("""
+            """
+            )
+            cur.execute(
+                """
                 CREATE TABLE vacancies (
                     vacancy_id VARCHAR(20) PRIMARY KEY,
                     employer_id VARCHAR(20) REFERENCES employers(employer_id),
@@ -48,7 +52,8 @@ def create_tables(conn) -> None:
                     currency VARCHAR(10),
                     url VARCHAR(255)
                 )
-            """)
+            """
+            )
         conn.commit()
         print("Таблицы 'employers' и 'vacancies' успешно созданы.")
 
@@ -62,16 +67,19 @@ def save_employer_to_db(conn, employer: Dict) -> None:
     """Сохранение данных работодателя в таблицу employers."""
     try:
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO employers (employer_id, name, industry, url)
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (employer_id) DO NOTHING
-            """, (
-                employer["id"],
-                employer["name"],
-                ", ".join([ind["name"] for ind in employer.get("industries", [])]),
-                employer["alternate_url"]
-            ))
+            """,
+                (
+                    employer["id"],
+                    employer["name"],
+                    ", ".join([ind["name"] for ind in employer.get("industries", [])]),
+                    employer["alternate_url"],
+                ),
+            )
         conn.commit()
         print(f"Работодатель '{employer['name']}' сохранён в БД > 'employers'.")
 
@@ -86,28 +94,33 @@ def save_vacancies_to_db(conn, vacancies: List[Dict], employer_id: str) -> None:
     try:
         with conn.cursor() as cur:
             for vacancy in vacancies:
-                employer_name = vacancy.get('employer', {}).get('name')
+                employer_name = vacancy.get("employer", {}).get("name")
                 salary = vacancy.get("salary")
                 salary_from = salary.get("from") if salary else None
                 salary_to = salary.get("to") if salary else None
                 currency = salary.get("currency") if salary else None
 
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO vacancies (vacancy_id, employer_id, title, description, salary_from, salary_to, currency, url)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (vacancy_id) DO NOTHING
-                """, (
-                    vacancy["id"],
-                    employer_id,
-                    vacancy["name"],
-                    vacancy.get("description", ""),
-                    salary_from,
-                    salary_to,
-                    currency,
-                    vacancy["alternate_url"]
-                ))
+                """,
+                    (
+                        vacancy["id"],
+                        employer_id,
+                        vacancy["name"],
+                        vacancy.get("description", ""),
+                        salary_from,
+                        salary_to,
+                        currency,
+                        vacancy["alternate_url"],
+                    ),
+                )
         conn.commit()
-        print(f"Сохранено {len(vacancies)} вакансий для работодателя '{employer_name}' в БД > 'vacancies'.")
+        print(
+            f"Сохранено {len(vacancies)} вакансий для работодателя '{employer_name}' в БД > 'vacancies'."
+        )
 
     except psycopg2.Error as e:
         conn.rollback()
