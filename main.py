@@ -7,6 +7,7 @@ from src.db_manager import DBManager
 
 
 def main() -> None:
+    """Собирает данные о работодателях и вакансиях с HH.ru в базу данных."""
     # Подключение к БД
     load_dotenv()
     db_params = {
